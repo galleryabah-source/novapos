@@ -1,0 +1,32 @@
+require('dotenv').config();
+const express = require('express');
+const cors = require('cors');
+const { createClient } = require('@supabase/supabase-js');
+
+const app = express();
+app.use(cors());
+app.use(express.json());
+
+const supabase = createClient(
+    process.env.SUPABASE_URL,
+    process.env.SUPABASE_SERVICE_ROLE_KEY
+);
+
+app.get('/', (req, res) => {
+    res.json({ message: 'NovaPOS Enterprise Backend is Running!' });
+});
+
+app.get('/api/products', async (req, res) => {
+    const { data, error } = await supabase.from('products').select('*');
+    if (error) return res.status(400).json({ error: error.message });
+    res.json(data);
+});
+
+app.post('/api/sales', async (req, res) => {
+    const { data, error } = await supabase.from('sales').insert([req.body]).select();
+    if (error) return res.status(400).json({ error: error.message });
+    res.json({ success: true, transaction: data[0] });
+});
+
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => console.log(`Server berjalan di port ${PORT}`));
