@@ -6,6 +6,7 @@ const products = require('./routes/products');
 const sales = require('./routes/sales');
 const { requireAuth } = require('./middleware/auth');
 const { requireOrganizationMember, requireOutlet } = require('./middleware/scope');
+const { requirePermission } = require('./middleware/authorize');
 const { attachRequestContext } = require('./lib/request-context');
 const { createRateLimiter } = require('./middleware/rate-limit');
 const { notFound, errorHandler } = require('./middleware/error');
@@ -31,8 +32,8 @@ app.use(createRateLimiter({ windowMs: 60_000, max: env.rateLimitPerMinute }));
 app.use('/health', health);
 
 const scoped = [requireAuth, requireOrganizationMember, requireOutlet];
-app.use('/api/products', scoped, products);
-app.use('/api/sales', scoped, sales);
+app.use('/api/products', scoped, requirePermission('product:read'), products);
+app.use('/api/sales', scoped, requirePermission('sale:create'), sales);
 
 app.use(notFound);
 app.use(errorHandler);
