@@ -7,7 +7,7 @@
     "start": "node index.js",
     "dev": "node --watch index.js",
     "test": "node --test",
-    "check": "node --check index.js && node --check src/app.js && node --check src/routes/sales.js && node --check src/routes/products.js"
+    "check": "node --check index.js && node --check src/app.js && node --check src/routes/sales.js && node --check src/routes/products.js && node --check src/middleware/rate-limit.js && node --check src/lib/request-context.js"
   },
   "keywords": ["pos", "retail", "inventory", "supabase", "postgres"],
   "license": "ISC",
