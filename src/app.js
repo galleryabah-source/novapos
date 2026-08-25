@@ -6,6 +6,8 @@ const products = require('./routes/products');
 const sales = require('./routes/sales');
 const { requireAuth } = require('./middleware/auth');
 const { requireOrganizationMember, requireOutlet } = require('./middleware/scope');
+const { attachRequestContext } = require('./lib/request-context');
+const { createRateLimiter } = require('./middleware/rate-limit');
 const { notFound, errorHandler } = require('./middleware/error');
 
 const app = express();
@@ -15,6 +17,7 @@ const allowedOrigins = env.corsOrigin
   : [];
 
 app.disable('x-powered-by');
+app.use(attachRequestContext);
 app.use(cors({
   origin(origin, callback) {
     if (!origin || allowedOrigins.length === 0 || allowedOrigins.includes(origin)) return callback(null, true);
@@ -23,6 +26,7 @@ app.use(cors({
   credentials: true,
 }));
 app.use(express.json({ limit: env.bodyLimit }));
+app.use(createRateLimiter({ windowMs: 60_000, max: env.rateLimitPerMinute }));
 
 app.use('/health', health);
 
