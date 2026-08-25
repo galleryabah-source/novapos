@@ -11,12 +11,7 @@ async function requireAuth(req, res, next) {
   }
 
   req.user = data.user;
-  req.requestId = req.headers['x-request-id'] || cryptoRandomId();
   next();
-}
-
-function cryptoRandomId() {
-  return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 12)}`;
 }
 
 module.exports = { requireAuth };
